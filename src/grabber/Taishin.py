@@ -2,7 +2,11 @@ import argparse
 import configparser
 import logging
 
+import ddddocr
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Taishin:
@@ -11,6 +15,60 @@ class Taishin:
         self.id = id
         self.uid = uid
         self.pwd = pwd
+
+    def login(self, url):
+        self.driver.get(url)
+        id = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[@id='userId']/input")
+            )  # noqa:E501
+        )
+        id.send_keys(self.id)
+
+        uid = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[@id='userName']/input")
+            )  # noqa:E501
+        )
+        uid.send_keys(self.uid)
+
+        pwd = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[3]/div/input",  # noqa:E501
+                )
+            )
+        )
+        pwd.send_keys(self.pwd)
+
+        # ocr verification
+        captcha_image = self.driver.find_element(
+            By.XPATH,
+            "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[4]/div/div[2]",  # noqa:E501
+        )
+        captcha_image.screenshot("code.png")
+        ocr = ddddocr.DdddOcr(show_ad=False)
+        with open("code.png", "rb") as fp:
+            img = fp.read()
+        captcha_node = ocr.classification(img)
+        code = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[4]/div/div[1]/div/input",  # noqa:E501
+                )
+            )
+        )
+        code.send_keys(captcha_node)
+
+        btn_login = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@id='setLoginData']/div[1]/form/div[2]/button")
+            )
+        )
+        btn_login.click()
+        logging.info("LOGIN SUCCESSFUL")
 
 
 if __name__ == "__main__":
@@ -28,4 +86,6 @@ if __name__ == "__main__":
     id = info.get("id")
     uid = info.get("uid")
     pwd = info.get("pwd")
+    url = "https://richart.tw/WebBank/users/login"
     client = Taishin(id, uid, pwd)
+    client.login(url)
