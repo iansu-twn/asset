@@ -75,9 +75,15 @@ class Taishin:
             )
             btn_login.click()
             try:
-                WebDriverWait(self.driver, 10).until(
-                    EC.alert_is_present()
-                ).accept()  # noqa:E501
+                btn_error = WebDriverWait(self.driver, 10).until(
+                    EC.element_to_be_clickable(
+                        (
+                            By.XPATH,
+                            "/html/body/ngb-modal-window/div/div/app-modal/div[2]/div/button",  # noqa:E501
+                        )
+                    )
+                )
+                btn_error.click()
             except TimeoutException:
                 flag = False
 
