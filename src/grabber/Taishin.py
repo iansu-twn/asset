@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import logging
+import re
 
 import ddddocr
 from selenium import webdriver
@@ -70,6 +71,28 @@ class Taishin:
         btn_login.click()
         logging.info("LOGIN SUCCESSFUL")
 
+    def info(self):
+        btn_unhidden = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@id='toggleShowAmount']/i[1]")
+            )  # noqa:E501
+        )
+        btn_unhidden.click()
+        elem = (
+            WebDriverWait(self.driver, 10)
+            .until(
+                EC.visibility_of_element_located(
+                    (
+                        By.XPATH,
+                        "//*[@id='first-element-introduction']/div[1]/div[2]/div",  # noqa:E501
+                    )
+                )
+            )
+            .text
+        )
+        cash = float(re.sub(r"[^\d.-]", "", elem.strip()))
+        return cash
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -89,3 +112,5 @@ if __name__ == "__main__":
     url = "https://richart.tw/WebBank/users/login"
     client = Taishin(id, uid, pwd)
     client.login(url)
+    cash = client.info()
+    print(f"cash: {cash}")
