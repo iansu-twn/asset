@@ -70,6 +70,14 @@ class Cathy:
         cash = float(info.strip().replace(",", ""))
         return cash
 
+    def logout(self):
+        btn_logout = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//*[@id='m-nav-logout']"))
+        )
+        btn_logout.click()
+        self.driver.close()
+        logging.info("LOGOUT SUCCESSFUL")
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -91,3 +99,4 @@ if __name__ == "__main__":
     client.login(url)
     cash = client.info()
     print(f"cash: {cash}")
+    client.logout()
