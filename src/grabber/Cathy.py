@@ -57,6 +57,19 @@ class Cathy:
         btn_login.click()
         logging.info("LOGIN SUCCESSFUL")
 
+    def info(self):
+        info = (
+            WebDriverWait(self.driver, 10)
+            .until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//*[@id='TD-balance']")
+                )  # noqa:E501
+            )
+            .text
+        )
+        cash = float(info.strip().replace(",", ""))
+        return cash
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -76,3 +89,5 @@ if __name__ == "__main__":
     url = "https://www.cathaybk.com.tw/mybank/"
     client = Cathy(id, uid, pwd)
     client.login(url)
+    cash = client.info()
+    print(f"cash: {cash}")
