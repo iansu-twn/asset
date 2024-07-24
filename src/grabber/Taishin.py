@@ -5,6 +5,7 @@ import re
 
 import ddddocr
 from selenium import webdriver
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -44,31 +45,42 @@ class Taishin:
         pwd.send_keys(self.pwd)
 
         # ocr verification
-        captcha_image = self.driver.find_element(
-            By.XPATH,
-            "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[4]/div/div[2]",  # noqa:E501
-        )
-        captcha_image.screenshot("code.png")
-        ocr = ddddocr.DdddOcr(show_ad=False)
-        with open("code.png", "rb") as fp:
-            img = fp.read()
-        captcha_node = ocr.classification(img)
-        code = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(
-                (
-                    By.XPATH,
-                    "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[4]/div/div[1]/div/input",  # noqa:E501
+        flag = True
+        while flag:
+            captcha_image = self.driver.find_element(
+                By.XPATH,
+                "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[4]/div/div[2]",  # noqa:E501
+            )
+            captcha_image.screenshot("code.png")
+            ocr = ddddocr.DdddOcr(show_ad=False)
+            with open("code.png", "rb") as fp:
+                img = fp.read()
+            captcha_node = ocr.classification(img)
+            code = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (
+                        By.XPATH,
+                        "//*[@id='setLoginData']/div[1]/form/div[1]/div/div[4]/div/div[1]/div/input",  # noqa:E501
+                    )
                 )
             )
-        )
-        code.send_keys(captcha_node)
-
-        btn_login = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//*[@id='setLoginData']/div[1]/form/div[2]/button")
+            code.send_keys(captcha_node)
+            btn_login = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable(
+                    (
+                        By.XPATH,
+                        "//*[@id='setLoginData']/div[1]/form/div[2]/button",
+                    )  # noqa:E501
+                )
             )
-        )
-        btn_login.click()
+            btn_login.click()
+            try:
+                WebDriverWait(self.driver, 10).until(
+                    EC.alert_is_present()
+                ).accept()  # noqa:E501
+            except TimeoutException:
+                flag = False
+
         logging.info("LOGIN SUCCESSFUL")
 
     def info(self):
