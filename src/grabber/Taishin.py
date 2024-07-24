@@ -93,6 +93,28 @@ class Taishin:
         cash = float(re.sub(r"[^\d.-]", "", elem.strip()))
         return cash
 
+    def logout(self):
+        btn_logout = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "/html/body/app-root/div/app-dashboard/richart-header/header/div/div/nav/div[2]/div/a",  # noqa:E501
+                )
+            )
+        )
+        btn_logout.click()
+        btn_confirm = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "/html/body/ngb-modal-window/div/div/app-modal/div[2]/div[2]/button",  # noqa:E501
+                )
+            )
+        )
+        btn_confirm.click()
+        self.driver.close()
+        logging.info("LOGOUT SUCCESSFUL")
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -114,3 +136,4 @@ if __name__ == "__main__":
     client.login(url)
     cash = client.info()
     print(f"cash: {cash}")
+    client.logout()
