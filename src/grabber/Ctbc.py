@@ -12,7 +12,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 class Ctbc:
     def __init__(self, id, uid, pwd):
         options = webdriver.ChromeOptions()
-        # options.add_argument("--headless")  # Run in headless mode
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
@@ -82,6 +81,25 @@ class Ctbc:
         cash = float(re.sub(r"[^\d.-]", "", elem.strip()))
         return cash
 
+    def logout(self):
+        btn_logout = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@id='btnHeaderLogout']")
+            )  # noqa:E501
+        )
+        btn_logout.click()
+        btn_confirm = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "/html/body/app/modal-confirm[2]/div/div/div/div[3]/a[1]",
+                )  # noqa:E501
+            )
+        )
+        btn_confirm.click()
+        self.driver.close()
+        logging.info("LOGOUT SUCCESSFUL")
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -103,3 +121,4 @@ if __name__ == "__main__":
     client.login(url)
     cash = client.info()
     print(f"cash: {cash}")
+    client.logout()
