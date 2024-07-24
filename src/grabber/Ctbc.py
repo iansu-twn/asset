@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import logging
+import re
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -65,6 +66,22 @@ class Ctbc:
         btn_login.click()
         logging.info("LOGIN SUCCESSFUL")
 
+    def info(self):
+        elem = (
+            WebDriverWait(self.driver, 10)
+            .until(
+                EC.visibility_of_element_located(
+                    (
+                        By.XPATH,
+                        "/html/body/app/div[1]/div[2]/twrbc-home-qu000-010/div/div/nav-tabs-overview/div/div[1]/span/span",  # noqa:E501
+                    )
+                )
+            )
+            .text
+        )
+        cash = float(re.sub(r"[^\d.-]", "", elem.strip()))
+        return cash
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -84,3 +101,5 @@ if __name__ == "__main__":
     url = "https://www.ctbcbank.com/twrbc/twrbc-general/ot001/010"
     client = Ctbc(id, uid, pwd)
     client.login(url)
+    cash = client.info()
+    print(f"cash: {cash}")
