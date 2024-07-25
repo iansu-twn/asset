@@ -1,23 +1,19 @@
 import argparse
-import configparser
 import logging
 
-from selenium import webdriver
+from Asset import Asset
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class Cathy:
-    def __init__(self, id, uid, pwd):
-        self.driver = webdriver.Chrome()
-        self.id = id
-        self.uid = uid
-        self.pwd = pwd
+class Cathy(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
-    def login(self, url):
-        self.driver.get(url)
+    def login(self):
+        self.driver.get(self.base_url)
         try:
             WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(
@@ -55,7 +51,7 @@ class Cathy:
             )
         )
         btn_login.click()
-        logging.info("LOGIN SUCCESSFUL")
+        logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
         info = (
@@ -75,8 +71,7 @@ class Cathy:
             EC.element_to_be_clickable((By.XPATH, "//*[@id='m-nav-logout']"))
         )
         btn_logout.click()
-        self.driver.close()
-        logging.info("LOGOUT SUCCESSFUL")
+        self._close_driver()
 
 
 if __name__ == "__main__":
@@ -86,17 +81,8 @@ if __name__ == "__main__":
     exchange = "CATHY"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    id = info.get("id")
-    uid = info.get("uid")
-    pwd = info.get("pwd")
-    url = "https://www.cathaybk.com.tw/mybank/"
-    client = Cathy(id, uid, pwd)
-    client.login(url)
+    client = Cathy(exchange)
+    client.login()
     cash = client.info()
-    print(f"cash: {cash}")
+    logging.info(f"Asset on {exchange}: {cash}")
     client.logout()

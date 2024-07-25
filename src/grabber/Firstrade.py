@@ -1,25 +1,21 @@
 import argparse
-import configparser
 import logging
 import time
 
 import pandas as pd
+from Asset import Asset
 from bs4 import BeautifulSoup
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class Firstrade:
-    def __init__(self, uid, pwd, code):
-        self.driver = webdriver.Chrome()
-        self.uid = uid
-        self.pwd = pwd
-        self.code = code
+class Firstrade(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
-    def login(self, url):
-        self.driver.get(url)
+    def login(self):
+        self.driver.get(self.base_url)
 
         uid = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//*[@id='username']"))
@@ -57,7 +53,7 @@ class Firstrade:
         )
         btn_continue.click()
 
-        logging.info("LOGIN SUCCESSFUL")
+        logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
         cash_info = WebDriverWait(self.driver, 10).until(
@@ -118,8 +114,7 @@ class Firstrade:
             )  # noqa:E501
         )
         btn_logout.click()
-        self.driver.close()
-        logging.info("LOGOUT SUCCESSFUL")
+        self._close_driver()
 
 
 if __name__ == "__main__":
@@ -129,20 +124,11 @@ if __name__ == "__main__":
     exchange = "FIRSTRADE"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    uid = info.get("uid")
-    pwd = info.get("pwd")
-    code = info.get("code")
-    url = "https://invest.firstrade.com/cgi-bin/login?ft_locale=zh-tw"
-    client = Firstrade(uid, pwd, code)
-    client.login(url)
+    client = Firstrade(exchange)
+    client.login()
     cash, stock = client.info()
     logging.info(f"cap: {round(stock.cap.sum(), 3)}")
     logging.info(f"total_cost: {round(stock.total_cost.sum(), 3)}")
     logging.info(f"pnl: {round(stock.pnl.sum(), 3)}")
-    logging.info(f"asset: {round(cash + stock.cap.sum(), 3)}")
+    logging.info(f"Asset on {exchange}: {round(cash + stock.cap.sum(), 3)}")
     client.logout()

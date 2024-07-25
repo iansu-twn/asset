@@ -1,29 +1,19 @@
 import argparse
-import configparser
 import logging
 import re
 
-from selenium import webdriver
+from Asset import Asset
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class Ctbc:
-    def __init__(self, id, uid, pwd):
-        options = webdriver.ChromeOptions()
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-blink-features")
-        self.driver = webdriver.Chrome(options=options)
-        self.id = id
-        self.uid = uid
-        self.pwd = pwd
+class Ctbc(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
-    def login(self, url):
-        self.driver.get(url)
+    def login(self):
+        self.driver.get(self.base_url)
         id = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(
                 (
@@ -63,7 +53,7 @@ class Ctbc:
             )
         )
         btn_login.click()
-        logging.info("LOGIN SUCCESSFUL")
+        logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
         elem = (
@@ -97,8 +87,7 @@ class Ctbc:
             )
         )
         btn_confirm.click()
-        self.driver.close()
-        logging.info("LOGOUT SUCCESSFUL")
+        self._close_driver()
 
 
 if __name__ == "__main__":
@@ -108,17 +97,8 @@ if __name__ == "__main__":
     exchange = "CTBC"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    id = info.get("id")
-    uid = info.get("uid")
-    pwd = info.get("pwd")
-    url = "https://www.ctbcbank.com/twrbc/twrbc-general/ot001/010"
-    client = Ctbc(id, uid, pwd)
-    client.login(url)
+    client = Ctbc(exchange)
+    client.login()
     cash = client.info()
-    print(f"cash: {cash}")
+    logging.info(f"Asset on {exchange}: {cash}")
     client.logout()

@@ -1,25 +1,21 @@
 import argparse
-import configparser
 import logging
 import re
 
 import ddddocr
-from selenium import webdriver
+from Asset import Asset
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class Ipost:
-    def __init__(self, id, uid, pwd):
-        self.driver = webdriver.Chrome()
-        self.id = id
-        self.uid = uid
-        self.pwd = pwd
+class Ipost(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
-    def login(self, url):
-        self.driver.get(url)
+    def login(self):
+        self.driver.get(self.base_url)
         flag = True
         while flag:
             try:
@@ -98,7 +94,7 @@ class Ipost:
                 )
             )
         )
-        logging.info("LOGIN SUCCESSFUL")
+        logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
         elem = WebDriverWait(self.driver, 10).until(
@@ -120,8 +116,7 @@ class Ipost:
             )
         )
         btn_confirm.click()
-        self.driver.close()
-        logging.info("LOGOUT SUCCESSFUL")
+        self._close_driver()
 
 
 if __name__ == "__main__":
@@ -131,17 +126,8 @@ if __name__ == "__main__":
     exchange = "IPOST"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    id = info.get("id")
-    uid = info.get("uid")
-    pwd = info.get("pwd")
-    url = "https://ipost.post.gov.tw/pst/home.html"
-    client = Ipost(id, uid, pwd)
-    client.login(url)
+    client = Ipost(exchange)
+    client.login()
     cash = client.info()
-    print(f"cash: {cash}")
+    logging.info(f"Asset on {exchange}: {cash}")
     client.logout()

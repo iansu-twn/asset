@@ -1,5 +1,4 @@
 import argparse
-import configparser
 import datetime
 import hashlib
 import hmac
@@ -7,19 +6,19 @@ import logging
 
 import pandas as pd
 import requests
+from Asset import Asset
 
 
-class Woo:
-    def __init__(self, api_key, api_secret):
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.base_url = "https://api.woo.org"
+class Woo(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
     def _generate_signature(self, data):
-        key = self.api_secret
-        key_bytes = bytes(key, "utf-8")
-        data_bytes = bytes(data, "utf-8")
-        return hmac.new(key_bytes, data_bytes, hashlib.sha256).hexdigest()
+        return hmac.new(
+            self.api_secret.encode("utf-8"),
+            data.encode("utf-8"),
+            hashlib.sha256,  # noqa:E501
+        ).hexdigest()
 
     def _generate_headers(self, method, endpoint):
         timestamp = str(round(datetime.datetime.now().timestamp() * 1000))
@@ -59,16 +58,9 @@ if __name__ == "__main__":
     logging.basicConfig(
         format="%(asctime)s %(levelname)s:%(message)s", level=logging.INFO
     )
-    exchange = "WOO"
+    exchange = "WOOX"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    api_key = info.get("api_key")
-    api_secret = info.get("api_secret")
-    client = Woo(api_key, api_secret)
+    client = Woo(exchange)
     df = client.getBalance()
     print(f"Asset on WOOX: {df.usdt_value.sum()}")

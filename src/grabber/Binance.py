@@ -1,5 +1,4 @@
 import argparse
-import configparser
 import datetime
 import hashlib
 import hmac
@@ -7,13 +6,12 @@ import logging
 
 import pandas as pd
 import requests
+from Asset import Asset
 
 
-class Binance:
-    def __init__(self, api_key, api_secret):
-        self.base_url = "https://api.binance.com"
-        self.api_key = api_key
-        self.api_secret = api_secret
+class Binance(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
     def _request(self, method, endpoint, params=None, signature=True):
         if params is None:
@@ -112,13 +110,6 @@ if __name__ == "__main__":
     exchange = "BINANCE"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    api_key = info.get("api_key")
-    api_secret = info.get("api_secret")
-    client = Binance(api_key, api_secret)
+    client = Binance(exchange)
     asset = client.getAsset()
-    print(f"Asset on Binance: {round(asset.usdt_value.sum(), 3)}")
+    print(f"Asset on {exchange}: {round(asset.usdt_value.sum(), 3)}")

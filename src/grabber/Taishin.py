@@ -1,25 +1,21 @@
 import argparse
-import configparser
 import logging
 import re
 
 import ddddocr
-from selenium import webdriver
+from Asset import Asset
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class Taishin:
-    def __init__(self, id, uid, pwd):
-        self.driver = webdriver.Chrome()
-        self.id = id
-        self.uid = uid
-        self.pwd = pwd
+class Taishin(Asset):
+    def __init__(self, exchange):
+        super().__init__(exchange)
 
-    def login(self, url):
-        self.driver.get(url)
+    def login(self):
+        self.driver.get(self.base_url)
         id = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(
                 (By.XPATH, "//*[@id='userId']/input")
@@ -86,10 +82,20 @@ class Taishin:
                 btn_error.click()
             except TimeoutException:
                 flag = False
-
-        logging.info("LOGIN SUCCESSFUL")
+        logging.info(f"{exchange} LOGIN SUCCESSFUL")
 
     def info(self):
+        # scam message confirm
+        try:
+            btn_scam = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, "//*[@id='jqBtnCloseCookie']")
+                )  # noqa: E501
+            )
+            btn_scam.click()
+        except TimeoutException:
+            pass
+
         btn_unhidden = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//*[@id='toggleShowAmount']/i[1]")
@@ -130,8 +136,7 @@ class Taishin:
             )
         )
         btn_confirm.click()
-        self.driver.close()
-        logging.info("LOGOUT SUCCESSFUL")
+        self._close_driver()
 
 
 if __name__ == "__main__":
@@ -141,17 +146,8 @@ if __name__ == "__main__":
     exchange = "TAISHIN"
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
-    cfg = configparser.ConfigParser()
-    cfg.read("./config/info.ini")
-    info = {}
-    for option in cfg.options(exchange):
-        info[option] = cfg.get(exchange, option)
-    id = info.get("id")
-    uid = info.get("uid")
-    pwd = info.get("pwd")
-    url = "https://richart.tw/WebBank/users/login"
-    client = Taishin(id, uid, pwd)
-    client.login(url)
+    client = Taishin(exchange)
+    client.login()
     cash = client.info()
-    print(f"cash: {cash}")
+    logging.info(f"Asset on {exchange}: {cash}")
     client.logout()
