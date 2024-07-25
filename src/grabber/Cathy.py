@@ -54,7 +54,7 @@ class Cathy(Asset):
         logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
-        info = (
+        cash_info = (
             WebDriverWait(self.driver, 10)
             .until(
                 EC.visibility_of_element_located(
@@ -63,8 +63,23 @@ class Cathy(Asset):
             )
             .text
         )
-        cash = float(info.strip().replace(",", ""))
-        return cash
+
+        btn_stock = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//*[@id='tabFUND']"))
+        )
+        btn_stock.click()
+        stock_info = (
+            WebDriverWait(self.driver, 10)
+            .until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//*[@id='FUND-balance']")
+                )  # noqa:E501
+            )
+            .text
+        )
+        cash = float(cash_info.strip().replace(",", ""))
+        stock = float(stock_info.strip().replace(",", ""))
+        return cash + stock
 
     def logout(self):
         btn_logout = WebDriverWait(self.driver, 10).until(
@@ -83,6 +98,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     client = Cathy(exchange)
     client.login()
-    cash = client.info()
-    logging.info(f"Asset on {exchange}: {cash}")
+    asset = client.info()
+    logging.info(f"Asset on {exchange}: {asset}")
     client.logout()
