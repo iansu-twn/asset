@@ -6,5 +6,6 @@ ddddocr==1.5.5
 logging==0.4.9.6
 pandas==2.2.2
 pre-commit==3.7.1
+python-binance==1.0.19
 requests==2.32.3
 selenium==4.23.1
