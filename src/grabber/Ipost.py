@@ -19,20 +19,22 @@ class Ipost(Asset):
         flag = True
         while flag:
             try:
-                WebDriverWait(self.driver, 10).until(
+                btn_msg = WebDriverWait(self.driver, 10).until(
                     EC.element_to_be_clickable(
                         (By.XPATH, "//*[@id='modal']/div[2]/button")
                     )
-                ).click()
+                )
+                btn_msg.click()
             except TimeoutException:
                 pass
 
             # change login method
-            WebDriverWait(self.driver, 10).until(
+            btn_change = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(
                     (By.XPATH, "//*[@id='content_wh']/div[1]/div/ul/li[1]/a")
                 )
-            ).click()
+            )
+            btn_change.click()
 
             id = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//*[@id='cifID']"))

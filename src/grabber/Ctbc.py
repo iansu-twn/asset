@@ -16,14 +16,15 @@ class Ctbc(Asset):
     def login(self):
         self.driver.get(self.base_url)
         try:
-            WebDriverWait(self.driver, 10).until(
+            btn_message = WebDriverWait(self.driver, 20).until(
                 EC.element_to_be_clickable(
                     (
                         By.XPATH,
                         "/html/body/app/modal-text/div/div/div/div[1]/a",
                     )  # noqa:E501
                 )
-            ).click()
+            )
+            btn_message.click()
         except TimeoutException:
             pass
 
