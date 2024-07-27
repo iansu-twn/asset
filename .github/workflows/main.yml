@@ -21,7 +21,7 @@ jobs:
 
     - name: Write INI config to file
       run: |
-        echo -e "${{ secrets.INI_CONFIG }}" > asset/src/grabber/info.ini
+        echo -e "${{ secrets.INI_CONFIG }}" > asset/src/grabber/config/info.ini
     
     - name: Install dependencies
       run: |
