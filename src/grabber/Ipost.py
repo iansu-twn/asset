@@ -103,7 +103,7 @@ class Ipost(Asset):
             )
         )
         cash = re.sub(r"[^\d.-]", "", elem.text.strip())
-        return cash
+        return float(cash)
 
     def logout(self):
         btn_logout = WebDriverWait(self.driver, 10).until(
