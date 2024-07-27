@@ -89,7 +89,7 @@ class Binance(Asset):
         price["price"] = price["price"].astype("float")
         return price
 
-    def getAsset(self):
+    def info(self):
         price = self.getPrice()
         spot_holding = self.getSpotHolding()
         margin_holding = self.getMarginHolding()
@@ -100,7 +100,8 @@ class Binance(Asset):
         df = df.groupby(["ccy"]).sum().reset_index()
         asset = df.merge(price, how="inner", on=["symbol"])
         asset["usdt_value"] = round(asset["balance"] * asset["price"], 3)
-        return asset.drop(["symbol"], axis=1)
+        # return asset.drop(["symbol"], axis=1) # write into db later
+        return round(asset.usdt_value.sum(), 3)
 
 
 if __name__ == "__main__":
@@ -111,5 +112,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(exchange)
     args = parser.parse_args()
     client = Binance(exchange)
-    asset = client.getAsset()
-    print(f"Asset on {exchange}: {round(asset.usdt_value.sum(), 3)}")
+    asset = client.info()
+    print(f"Asset on {exchange}: {asset}")
