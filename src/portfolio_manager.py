@@ -10,7 +10,7 @@ logging.basicConfig(
 
 exchange_list = [
     "Firstrade",
-    "Binance",
+    # "Binance",
     "Cathy",
     "Ctbc",
     "Ipost",
