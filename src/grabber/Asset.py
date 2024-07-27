@@ -6,7 +6,9 @@ from selenium.webdriver.chrome.options import Options
 
 
 class Asset:
-    def __init__(self, exchange, config_path="./grabber/config/info.ini"):
+    def __init__(
+        self, exchange, config_path="asset/src/grabber/config/info.ini"
+    ):  # noqa:E501
         self.exchange = exchange
         info = self._getInfo(self.exchange, config_path)
         for key, value in info.items():
