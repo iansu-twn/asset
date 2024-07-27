@@ -82,7 +82,7 @@ class Taishin(Asset):
                 btn_error.click()
             except TimeoutException:
                 flag = False
-        logging.info(f"{exchange} LOGIN SUCCESSFUL")
+        logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
         # scam message confirm
