@@ -12,7 +12,7 @@ exchange_list = [
     "Firstrade",
     # "Binance",
     "Cathy",
-    "Ctbc",
+    # "Ctbc",
     "Ipost",
     "Taishin",
     "Woox",
