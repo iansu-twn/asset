@@ -1,3 +1,31 @@
+name: portfolio manager
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
 jobs:
-  my first_job:
-    name: portfolio_manager.py
+  portfolio-manager:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: portfolio manager script
+      env: 
+        CONFIG: ${{ secrets.CONFIG}}
+      run: |
+        python src/portfolio_manager.py
