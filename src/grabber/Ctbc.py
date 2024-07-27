@@ -3,6 +3,7 @@ import logging
 import re
 
 from Asset import Asset
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,6 +15,18 @@ class Ctbc(Asset):
 
     def login(self):
         self.driver.get(self.base_url)
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable(
+                    (
+                        By.XPATH,
+                        "/html/body/app/modal-text/div/div/div/div[1]/a",
+                    )  # noqa:E501
+                )
+            ).click()
+        except TimeoutException:
+            pass
+
         id = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(
                 (
