@@ -19,6 +19,9 @@ jobs:
       with:
         python-version: "3.12"
 
+    - name: Create config dir
+      run: mkdir -p asset/src/grabber/config
+
     - name: Write INI config to file
       run: |
         echo -e "${{ secrets.INI_CONFIG }}" > asset/src/grabber/config/info.ini
