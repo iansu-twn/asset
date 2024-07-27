@@ -5,6 +5,7 @@ import time
 import pandas as pd
 from Asset import Asset
 from bs4 import BeautifulSoup
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,47 +17,65 @@ class Firstrade(Asset):
 
     def login(self):
         self.driver.get(self.base_url)
-
-        uid = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//*[@id='username']"))
-        )
-        uid.send_keys(self.uid)
-
-        pwd = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//*[@id='password']"))
-        )
-        pwd.send_keys(self.pwd)
-
-        btn_login = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "//*[@id='loginButton']")
-            )  # noqa:E501
-        )
-        btn_login.click()
-
-        btn_check = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "/html/body/div/main/div/div/div[3]/a")
+        flag = True
+        while flag:
+            uid = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//*[@id='username']")
+                )  # noqa:E501
             )
-        )
-        btn_check.click()
+            uid.send_keys(self.uid)
 
-        code = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//*[@id='pin']"))
-        )
-        code.send_keys(self.code)
-
-        btn_continue = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "//*[@id='form-pin']/div[2]/button")
+            pwd = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//*[@id='password']")
+                )  # noqa:E501
             )
-        )
-        btn_continue.click()
+            pwd.send_keys(self.pwd)
+
+            btn_login = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//*[@id='loginButton']")
+                )  # noqa:E501
+            )
+            btn_login.click()
+
+            btn_check = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "/html/body/div/main/div/div/div[3]/a")
+                )
+            )
+            btn_check.click()
+
+            code = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//*[@id='pin']"))
+            )
+            code.send_keys(self.code)
+
+            btn_continue = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//*[@id='form-pin']/div[2]/button")
+                )
+            )
+            btn_continue.click()
+
+            try:
+                WebDriverWait(self.driver, 10).until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, "//*[@id='myaccount_link']/a")
+                    )  # noqa:E501
+                )
+                self.driver.refresh()
+                flag = False
+
+            except TimeoutException:
+                self.driver.get(self.base_url)
 
         logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
     def info(self):
-        cash_info = WebDriverWait(self.driver, 10).until(
+        self.driver.refresh()
+        cash_info = WebDriverWait(self.driver, 20).until(
             EC.presence_of_element_located(
                 (By.XPATH, "//*[@id='myaccount_link']/a")
             )  # noqa:E501
@@ -105,7 +124,8 @@ class Firstrade(Asset):
             }
             rows.append(dt)
         df = pd.DataFrame(rows)
-        return cash, df
+        # return cash, df # write into db late
+        return round(cash + df.cap.sum(), 3)
 
     def logout(self):
         btn_logout = WebDriverWait(self.driver, 10).until(
@@ -126,9 +146,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     client = Firstrade(exchange)
     client.login()
-    cash, stock = client.info()
-    logging.info(f"cap: {round(stock.cap.sum(), 3)}")
-    logging.info(f"total_cost: {round(stock.total_cost.sum(), 3)}")
-    logging.info(f"pnl: {round(stock.pnl.sum(), 3)}")
-    logging.info(f"Asset on {exchange}: {round(cash + stock.cap.sum(), 3)}")
+    asset = client.info()
+    # logging.info(f"cap: {round(stock.cap.sum(), 3)}")
+    # logging.info(f"total_cost: {round(stock.total_cost.sum(), 3)}")
+    # logging.info(f"pnl: {round(stock.pnl.sum(), 3)}")
+    logging.info(f"Asset on {exchange}: {asset}")
     client.logout()
