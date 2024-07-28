@@ -14,19 +14,24 @@ pip install -r requirements.txt
 
 ### Directories
 ```mermaid
-graph LR;
-  asset--> requirements.txt;
-  asset--> src --> portfolio_manager.py;
-  asset--> src --> grabber --> Asset.py;
-  asset--> src --> grabber --> Binance.py;
-  asset--> src --> grabber --> Cathy.py;
-  asset--> src --> grabber --> Ctbc.py;
-  asset--> src --> grabber --> Firstrade.py;
-  asset--> src --> grabber --> Ipost.py;
-  asset--> src --> grabber --> Taishin.py;
-  asset--> src --> grabber --> Woox.py;
-  asset--> src --> grabber --> config --> info.ini;
+graph TD;
+  asset
+  asset --> requirements.txt
+  asset --> src
+  src --> portfolio_manager.py
+  src --> grabber
+  grabber --> config
+  config --> info.ini
+  grabber --> Asset.py
+  grabber --> Binance.py
+  grabber --> Cathy.py
+  grabber --> Ctbc.py
+  grabber --> Firstrade.py
+  grabber --> Ipost.py
+  grabber --> Taishin.py
+  grabber --> Woox.py
 ```
+
 
 ### Github Actions
 - run automatically (hourly)
