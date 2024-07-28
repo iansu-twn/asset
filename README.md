@@ -44,4 +44,5 @@ graph TD;
    - exchange/bank maintenance
    - pop up message bug
    - use more try-except blocks to ensure the process runs smoothly
-3. create a dash
+3. create a dashboard to record asset changes
+4. Binance APIs won't work due to legal restrictions.
