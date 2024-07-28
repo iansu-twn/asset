@@ -58,7 +58,7 @@ class Ctbc(Asset):
         )
         pwd.send_keys(self.pwd)
 
-        self.driver.save_screenshot("login.png")
+        self.driver.save_screenshot("./asset/src/grabber/login.png")
 
         btn_login = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(
