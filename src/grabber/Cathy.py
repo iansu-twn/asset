@@ -83,7 +83,9 @@ class Cathy(Asset):
 
     def logout(self):
         btn_logout = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[@id='m-nav-logout']"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@id='sub-menu']/div/div[3]/a[1]")
+            )
         )
         btn_logout.click()
         self._close_driver()
