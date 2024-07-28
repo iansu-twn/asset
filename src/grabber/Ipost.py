@@ -27,7 +27,7 @@ class Ipost(Asset):
                 btn_msg.click()
             except TimeoutException:
                 pass
-
+            self.driver.save_screenshot("./asset/src/grabber/login.png")
             # change login method
             btn_change = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(
