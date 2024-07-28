@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   portfolio-manager:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Checkout repository
@@ -26,8 +26,8 @@ jobs:
       run: |
         echo -e "${{ secrets.INI_CONFIG }}" > ./asset/src/grabber/config/info.ini
     
-    - name: Print directory structure for debugging
-      run: ls -R
+    # - name: Print directory structure for debugging
+    #   run: ls -R
       
     - name: Install dependencies
       run: |
