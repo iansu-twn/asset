@@ -39,3 +39,10 @@ jobs:
         CONFIG: ${{ secrets.CONFIG}}
       run: |
         python src/portfolio_manager.py
+
+    - name: Upload screenshot to debug
+      if: success() || failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: screenshot
+        path: ./asset/src/screenshot.png
