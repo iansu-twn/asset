@@ -19,6 +19,13 @@ class Ipost(Asset):
         flag = True
         while flag:
             try:
+                WebDriverWait(self.driver, 10).until(
+                    EC.alert_is_present()
+                ).accept()  # noqa:E501
+            except TimeoutException:
+                pass
+
+            try:
                 btn_msg = WebDriverWait(self.driver, 10).until(
                     EC.element_to_be_clickable(
                         (By.XPATH, "//*[@id='modal']/div[2]/button")
