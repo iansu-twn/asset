@@ -46,3 +46,5 @@ graph TD;
    - use more try-except blocks to ensure the process runs smoothly
 3. create a dashboard to record asset changes
 4. Binance APIs won't work due to legal restrictions.
+5. Add usd/twd exchange rate api
+6. Reduce duplicate code
