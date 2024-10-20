@@ -7,13 +7,13 @@ import sys
 import telebot
 
 exchange_list = [
-    "Firstrade",
-    # "Binance",
-    "Cathy",
-    "Ctbc",
     "Ipost",
+    "Ctbc",
+    "Cathy",
     "Taishin",
     "Woox",
+    "Firstrade",
+    # "Binance",
 ]  # noqa:E501
 
 
