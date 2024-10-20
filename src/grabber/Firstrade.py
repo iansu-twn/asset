@@ -57,6 +57,7 @@ class Firstrade(Asset):
                     (By.XPATH, "//*[@id='form-pin']/div[2]/button")
                 )
             )
+            time.sleep(5)
             btn_continue.click()
 
             try:
@@ -75,6 +76,7 @@ class Firstrade(Asset):
 
     def info(self):
         self.driver.refresh()
+        time.sleep(10)
         cash_info = WebDriverWait(self.driver, 20).until(
             EC.presence_of_element_located(
                 (By.XPATH, "//*[@id='myaccount_link']/a")
@@ -130,7 +132,7 @@ class Firstrade(Asset):
     def logout(self):
         btn_logout = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(
-                (By.XPATH, "//*[@id='head']/ul/li[8]/a")
+                (By.XPATH, "//*[@id='head']/ul/li[7]/a")
             )  # noqa:E501
         )
         btn_logout.click()
