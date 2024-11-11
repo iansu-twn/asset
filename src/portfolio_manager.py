@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 
+import requests
 import telebot
 
 exchange_list = [
@@ -13,8 +14,15 @@ exchange_list = [
     "Taishin",
     "Woox",
     "Firstrade",
+    "FF",
+    "Allianz",
     # "Binance",
 ]  # noqa:E501
+
+hardcoded_asset = {
+    "FF": 2400,
+    "Allianz": 800000,
+}
 
 
 class Main:
@@ -42,29 +50,43 @@ class Main:
         total_asset = 0
         msg = []
         for exchange_name in exchange_list:
-            module = importlib.import_module(f"grabber.{exchange_name}")
-            exchange_class = getattr(module, exchange_name)
-            exchange_instance = exchange_class(exchange_name.upper())
-
-            if hasattr(exchange_instance, "login"):
-                exchange_instance.login()
-
-            if hasattr(exchange_instance, "info"):
-                asset = exchange_instance.info()
+            if exchange_name in ["FF", "Allianz"]:
+                asset = hardcoded_asset.get(exchange_name)
                 msg.append(f"Asset on {exchange_name.upper()}: {asset}")
+                total_asset += (
+                    asset * self._getExchangeRate()
+                    if exchange_name == "FF"
+                    else float(asset)
+                )
+            else:
+                module = importlib.import_module(f"grabber.{exchange_name}")
+                exchange_class = getattr(module, exchange_name)
+                exchange_instance = exchange_class(exchange_name.upper())
 
-            if hasattr(exchange_instance, "logout"):
-                exchange_instance.logout()
+                if hasattr(exchange_instance, "login"):
+                    exchange_instance.login()
 
-            total_asset += (
-                asset * 32
-                if exchange_name in ["Binance", "Firstrade", "Woox"]
-                else float(asset)
-            )
+                if hasattr(exchange_instance, "info"):
+                    asset = exchange_instance.info()
+                    msg.append(f"Asset on {exchange_name.upper()}: {asset}")
+
+                if hasattr(exchange_instance, "logout"):
+                    exchange_instance.logout()
+
+                total_asset += (
+                    asset * self._getExchangeRate()
+                    if exchange_name in ["Binance", "Firstrade", "Woox"]
+                    else float(asset)
+                )
         msg.append(f"Total Asset: {round(total_asset, 3)}")
         messages = "\n".join(msg)
         self.bot.send_message(self.chat_id, messages)
         logging.info("Message sent!")
+
+    def _getExchangeRate(self):
+        res = requests.get("https://tw.rter.info/capi.php")
+        currency = res.json()
+        return currency.get("USDTWD").get("Exrate")
 
 
 if __name__ == "__main__":
