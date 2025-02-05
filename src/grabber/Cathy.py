@@ -103,6 +103,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     client = Cathy(exchange)
     client.login()
-    asset = client.info()
+    asset = client.info(idx="cash")
     logging.info(f"Asset on {exchange}: {asset}")
     client.logout()
