@@ -68,11 +68,13 @@ class Main:
 
                 if hasattr(exchange_instance, "info"):
                     if exchange_name == "Cathy":
+                        assets = 0
                         for idx in ["cash", "stock"]:
                             asset = exchange_instance.info(idx)
                             msg.append(
                                 f"Asset on {exchange_name.upper()}_{idx.upper()}: {asset}"  # noqa:E501
                             )
+                            assets += asset
                     else:
                         asset = exchange_instance.info()
                         msg.append(
