@@ -53,33 +53,36 @@ class Cathy(Asset):
         btn_login.click()
         logging.info(f"{self.exchange} LOGIN SUCCESSFUL")
 
-    def info(self):
-        cash_info = (
-            WebDriverWait(self.driver, 10)
-            .until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//*[@id='TD-balance']")
-                )  # noqa:E501
+    def info(self, idx):
+        if idx == "cash":
+            cash_info = (
+                WebDriverWait(self.driver, 10)
+                .until(
+                    EC.visibility_of_element_located(
+                        (By.XPATH, "//*[@id='TD-balance']")
+                    )  # noqa:E501
+                )
+                .text
             )
-            .text
-        )
+            cash = float(cash_info.strip().replace(",", ""))
+            return cash
 
-        btn_stock = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[@id='tabFUND']"))
-        )
-        btn_stock.click()
-        stock_info = (
-            WebDriverWait(self.driver, 10)
-            .until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//*[@id='FUND-balance']")
-                )  # noqa:E501
+        else:
+            btn_stock = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//*[@id='tabFUND']"))
             )
-            .text
-        )
-        cash = float(cash_info.strip().replace(",", ""))
-        stock = float(stock_info.strip().replace(",", ""))
-        return cash + stock
+            btn_stock.click()
+            stock_info = (
+                WebDriverWait(self.driver, 10)
+                .until(
+                    EC.visibility_of_element_located(
+                        (By.XPATH, "//*[@id='FUND-balance']")
+                    )  # noqa:E501
+                )
+                .text
+            )
+            stock = float(stock_info.strip().replace(",", ""))
+            return stock
 
     def logout(self):
         btn_logout = WebDriverWait(self.driver, 10).until(
