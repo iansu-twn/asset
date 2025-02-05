@@ -67,8 +67,13 @@ class Main:
                     exchange_instance.login()
 
                 if hasattr(exchange_instance, "info"):
-                    asset = exchange_instance.info()
-                    msg.append(f"Asset on {exchange_name.upper()}: {asset}")
+                    if exchange_name == 'Cathy':
+                        for idx in ["cash", "stock"]:
+                            asset = exchange_instance.info(idx)
+                            msg.append(f"Asset on {exchange_name.upper()}_{idx.upper()}: {asset}")
+                    else:
+                        asset = exchange_instance.info()
+                        msg.append(f"Asset on {exchange_name.upper()}: {asset}")
 
                 if hasattr(exchange_instance, "logout"):
                     exchange_instance.logout()
