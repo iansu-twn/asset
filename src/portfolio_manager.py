@@ -20,7 +20,7 @@ exchange_list = [
 ]  # noqa:E501
 
 hardcoded_asset = {
-    "FF": 2400,
+    "FF": 18400,
     "Allianz": 800000,
 }
 
