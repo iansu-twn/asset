@@ -49,7 +49,7 @@ class Ipost(Asset):
             # except TimeoutException:
             #     pass
 
-            self.driver.save_screenshot("./asset/src/grabber/login.png")
+            # self.driver.save_screenshot("./asset/src/grabber/login.png")
             id = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//*[@id='cifID']"))
             )
@@ -90,6 +90,7 @@ class Ipost(Asset):
                     (By.XPATH, "//*[@id='tab1']/div[12]/a")
                 )  # noqa:E501
             )
+            self.driver.save_screenshot("./asset/src/grabber/login.png")
             btn_login.click()
             try:
                 WebDriverWait(self.driver, 10).until(
