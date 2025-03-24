@@ -35,19 +35,19 @@ class Ipost(Asset):
             except TimeoutException:
                 pass
 
-            try:
-                # change login method
-                btn_change = WebDriverWait(self.driver, 10).until(
-                    EC.element_to_be_clickable(
-                        (
-                            By.XPATH,
-                            "//*[@id='content_wh']/div[1]/div/ul/li[1]/a",
-                        )  # noqa:E501
-                    )
-                )
-                btn_change.click()
-            except TimeoutException:
-                pass
+            # try:
+            #     # change login method
+            #     btn_change = WebDriverWait(self.driver, 10).until(
+            #         EC.element_to_be_clickable(
+            #             (
+            #                 By.XPATH,
+            #                 "//*[@id='content_wh']/div[1]/div/ul/li[1]/a",
+            #             )  # noqa:E501
+            #         )
+            #     )
+            #     btn_change.click()
+            # except TimeoutException:
+            #     pass
 
             self.driver.save_screenshot("./asset/src/grabber/login.png")
             id = WebDriverWait(self.driver, 10).until(
