@@ -26,7 +26,7 @@ class Ipost(Asset):
                 pass
 
             try:
-                btn_msg = WebDriverWait(self.driver, 10).until(
+                btn_msg = WebDriverWait(self.driver, 20).until(
                     EC.element_to_be_clickable(
                         (By.XPATH, "//*[@id='modal']/div[2]/button")
                     )
